@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLUE HOUR — 蓝调时刻 · 安静写作台</title>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('bh-theme');
+      if (t !== 'night' && t !== 'sunset') t = 'night';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<meta name="description" content="日落后二十分钟的个人写作台。关于设计、代码、工具与日常的长期笔记。">
+<meta property="og:title" content="BLUE HOUR — 蓝调时刻">
+<meta property="og:description" content="日落后二十分钟的个人写作台。">
+<meta property="og:image" content="{{BASE}}assets/og-cover.png">
+<link rel="icon" href="{{BASE}}assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{{BASE}}css/base.css">
+<link rel="stylesheet" href="{{BASE}}css/layout.css">
+<link rel="stylesheet" href="{{BASE}}css/components.css">
+<link rel="stylesheet" href="{{BASE}}css/effects.css">
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="l-inner">
+    <div class="l-ring"></div>
+    <div class="l-text">Blue Hour</div>
+  </div>
+</div>
+
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<canvas id="bg"></canvas>
+<canvas id="fx"></canvas>
+
+<div class="sunset-wash" aria-hidden="true"></div>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="rays" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grid-lines" aria-hidden="true"></div>
+<div class="particles" id="particles" aria-hidden="true"></div>
+<div class="sun" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress"></div>
+
+<button class="back-top" id="backTop" aria-label="回到顶部">
+  <svg viewBox="0 0 46 46" aria-hidden="true">
+    <circle class="bt-track" cx="23" cy="23" r="20"></circle>
+    <circle class="bt-progress" id="btProgress" cx="23" cy="23" r="20"></circle>
+  </svg>
+  <span>↑</span>
+</button>
+
+<aside class="tag-side" id="tagSide" aria-label="标签导航">
+  <button class="tag-rail" id="tagRail" aria-label="展开标签面板" aria-expanded="false" aria-controls="tagPanel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/>
+      <circle cx="7.5" cy="7.5" r="1.5"/>
+    </svg>
+    <span>标签</span>
+  </button>
+
+  <div class="tag-panel" id="tagPanel">
+    <div class="tag-panel-head">
+      <div>
+        <div class="tag-panel-title">按关键词找</div>
+        <div class="tag-panel-desc">点击标签回到文章区并过滤</div>
+      </div>
+      <button class="tag-panel-close" id="tagClose" aria-label="收起标签面板">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tag-cloud-side">
+      {{SIDEBAR_TAGS}}
+    </div>
+
+    <div class="tag-panel-foot">
+      <button class="tag-clear" id="tagClear" type="button">清除筛选</button>
+      <span class="tag-count">{{SIDEBAR_TAG_COUNT}} 个标签</span>
+    </div>
+  </div>
+</aside>
+
+<div class="tag-scrim" id="tagScrim" aria-hidden="true"></div>
+
+<button class="tag-fab" id="tagFab" aria-label="打开标签面板">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/>
+    <circle cx="7.5" cy="7.5" r="1.5"/>
+  </svg>
+</button>
+
+<header class="nav" id="nav">
+  <a class="logo" href="{{BASE}}index.html">BLUE<b>·</b>HOUR</a>
+  <nav id="mainNav">
+    <a href="#featured">精选</a>
+    <a href="#columns">栏目</a>
+    <a href="#series">系列</a>
+    <a href="#posts">文章</a>
+    <a href="#tags" id="navTags">标签</a>
+    <a href="#archive">归档</a>
+    <a href="#about">关于</a>
+  </nav>
+  <div class="theme-switch" role="group" aria-label="主题切换">
+    <span class="pill" aria-hidden="true"></span>
+    <button type="button" data-theme="night">夜</button>
+    <button type="button" data-theme="sunset">夕</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-deco" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="hero-inner">
+      <div class="tag seq"><span class="dot"></span>Journal / 2026</div>
+
+      <h1 class="display">
+        <span class="row"><span class="grad" style="--d:.10s">Blue</span></span>
+        <span class="row"><span class="outline" style="--d:.24s">Hour</span></span>
+      </h1>
+
+      <div class="subline seq">
+        <span class="cn">蓝调时刻</span>
+        <span class="rule"></span>
+        <span class="en">日落后 · 一个人的安静写作台</span>
+      </div>
+
+      <p class="lead-p seq">
+        关于设计、代码、工具与日常的长期笔记。
+        写在天色将暗未暗的十几分钟里，慢一点，也诚实一点。
+        不追热点，只把想清楚的事留在这里。
+      </p>
+
+      <div class="hero-actions seq">
+        <a class="btn magnetic" href="#posts">开始阅读 <span class="arw">→</span></a>
+        <a class="ghost-link" href="#series">连载系列</a>
+      </div>
+
+      <div class="hero-stats seq">
+        <div><b data-count="{{POST_COUNT}}">0</b><span>篇文章</span></div>
+        <div><b data-count="{{CATEGORY_COUNT}}">0</b><span>个栏目</span></div>
+        <div><b data-count="{{SERIES_COUNT}}">0</b><span>个系列</span></div>
+        <div><b data-count="{{ARCHIVE_COUNT}}">0</b><span>累计归档</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="featured">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">01 — 精选</span>
+          <h2 class="sec-title">这个月，<em>值得一读</em></h2>
+          <p class="sec-desc">从最近写完的文章里挑出三篇，分别关于界面的克制、颜色的过渡，以及慢下来的必要。</p>
+        </div>
+        <a class="ghost-link" href="#posts">全部文章</a>
+      </div>
+
+      <div class="feat-grid">
+        {{FEATURED}}
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="columns">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">02 — 栏目</span>
+          <h2 class="sec-title">四个<em>长期写作</em>的方向</h2>
+        </div>
+      </div>
+
+      <div class="cols">
+        <a class="col-card reveal tilt" href="#posts">
+          <span class="num">01</span><span class="en">Design</span>
+          <h3>设计观察</h3>
+          <p>界面、排版与色彩背后的判断，以及那些被忽略的细节。</p>
+          <div class="count"><span>设计</span><span>长期</span></div>
+        </a>
+        <a class="col-card reveal tilt" href="#posts">
+          <span class="num">02</span><span class="en">Code</span>
+          <h3>技术手记</h3>
+          <p>前端实践、CSS 技巧与踩坑记录，尽量写清为什么。</p>
+          <div class="count"><span>技术</span><span>长期</span></div>
+        </a>
+        <a class="col-card reveal tilt" href="#posts">
+          <span class="num">03</span><span class="en">Life</span>
+          <h3>生活切片</h3>
+          <p>凌晨的街道、雨天的唱片，以及一些没有结论的随笔。</p>
+          <div class="count"><span>生活</span><span>长期</span></div>
+        </a>
+        <a class="col-card reveal tilt" href="#posts">
+          <span class="num">04</span><span class="en">Notes</span>
+          <h3>资源与笔记</h3>
+          <p>工具清单、阅读摘记，和持续更新的个人知识库。</p>
+          <div class="count"><span>笔记</span><span>长期</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="series">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">03 — 系列</span>
+          <h2 class="sec-title">写长一点的<em>连载</em></h2>
+          <p class="sec-desc">有些话题一篇写不完，就拆成系列。下面三个都在进行中，进度会随着文章发布更新。</p>
+        </div>
+      </div>
+
+      <div class="series">
+        <a class="series-card glow-border reveal tilt" href="#posts">
+          <div class="s-top"><span>Design System</span><b>进行中</b></div>
+          <h3>暗色界面的十二条法则</h3>
+          <p>从对比度、灰度层级到边界与呼吸，一套可以直接照用的暗色界面方法论。</p>
+          <div class="bar"><i style="--p:66%"></i></div>
+          <div class="s-foot"><span>8 / 12 篇</span><span>更新至 11.02</span></div>
+        </a>
+        <a class="series-card glow-border reveal tilt" href="#posts">
+          <div class="s-top"><span>CSS Deep Dive</span><b>进行中</b></div>
+          <h3>现代 CSS 的隐藏能力</h3>
+          <p>@property、容器查询、:has 与层叠层，把那些“原来还能这样”写清楚。</p>
+          <div class="bar"><i style="--p:45%"></i></div>
+          <div class="s-foot"><span>5 / 11 篇</span><span>更新至 11.08</span></div>
+        </a>
+        <a class="series-card glow-border reveal tilt" href="#posts">
+          <div class="s-top"><span>Slow Living</span><b>连载中</b></div>
+          <h3>慢下来的一年</h3>
+          <p>关于减少、专注与留白的生活实验，按月记录，不做总结陈词。</p>
+          <div class="bar"><i style="--p:30%"></i></div>
+          <div class="s-foot"><span>4 / 12 篇</span><span>更新至 10.27</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="posts">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">04 — 文章</span>
+          <h2 class="sec-title">最近<em>写了什么</em></h2>
+        </div>
+      </div>
+
+      <div class="filter-bar reveal">
+        <div class="chips" role="group" aria-label="分类筛选">
+          <button class="chip on" data-filter="all">全部</button>
+          <button class="chip" data-filter="design">设计</button>
+          <button class="chip" data-filter="code">技术</button>
+          <button class="chip" data-filter="life">生活</button>
+          <button class="chip" data-filter="note">笔记</button>
+        </div>
+
+        <label class="search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-4.2-4.2"></path>
+          </svg>
+          <input id="search" type="search" placeholder="搜索文章…" aria-label="搜索文章">
+          <span class="key">/</span>
+        </label>
+      </div>
+
+      <div class="posts" id="postGrid">
+        {{POSTS_LIST}}
+      </div>
+
+      <div class="empty" id="empty">没有匹配的文章，换个关键词试试</div>
+
+      <div class="more-wrap" id="moreWrap">
+        <button class="btn sm magnetic" id="loadMore" type="button">加载更多 <span class="arw">↓</span></button>
+        <span class="more-count" id="moreCount"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="archive">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">06 — 归档</span>
+          <h2 class="sec-title">按<em>时间</em>翻阅</h2>
+        </div>
+      </div>
+
+      <div class="archive">
+        {{ARCHIVE}}
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-divider><span></span></div>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="left">
+          <span class="label">07 — 关于</span>
+          <h2 class="sec-title">写这些字的<em>人</em></h2>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-card reveal">
+          <div class="about-top">
+            <div class="avatar" aria-hidden="true"><span>BH</span></div>
+            <div class="who">
+              <strong>关于作者</strong>
+              <small>独立设计 · 前端 · 长期主义者</small>
+            </div>
+          </div>
+          <p>
+            独立设计与前端，住在一座多雨的城市。白天做界面，晚上写字，偶尔拍照片。
+            这个博客从 2024 年开始更新，中间停过两次，每次回来都删掉一批旧文章。
+          </p>
+          <p>
+            这里没有更新频率的承诺，也不打算做选题规划。想清楚一件事，就写下来；
+            写不清楚，就先放着。如果你也在做类似的事，欢迎写信聊聊。
+          </p>
+          <div class="about-links">
+            <a class="btn sm magnetic" href="mailto:hello@bluehour.studio">写邮件</a>
+            <a class="btn sm magnetic" href="#archive">全部归档</a>
+          </div>
+        </div>
+
+        <aside class="fact-list reveal">
+          <h4>一些数字</h4>
+          <div class="facts">
+            <div class="fact"><span>文章总数</span><b>{{POST_COUNT}}</b></div>
+            <div class="fact"><span>持续写作</span><b>2 年 4 个月</b></div>
+            <div class="fact"><span>最近更新</span><b>持续更新</b></div>
+            <div class="fact"><span>平均篇幅</span><b>2,400 字</b></div>
+          </div>
+          <h4 style="margin-top:26px">常写的东西</h4>
+          <div class="skills">
+            <span>界面设计</span><span>CSS</span><span>动效</span>
+            <span>排版</span><span>工具</span><span>随笔</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-main">
+      <div class="foot-brand">
+        <a class="logo" href="{{BASE}}index.html">BLUE<b>·</b>HOUR</a>
+        <p>日落后二十分钟的个人写作台。关于设计、代码、工具与日常的长期笔记。</p>
+      </div>
+
+      <div class="foot-col">
+        <h5>浏览</h5>
+        <ul>
+          <li><a href="#featured">精选</a></li>
+          <li><a href="#columns">栏目</a></li>
+          <li><a href="#series">系列</a></li>
+          <li><a href="#posts">全部文章</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h5>更多</h5>
+        <ul>
+          <li><a href="#tags" id="footTags">标签</a></li>
+          <li><a href="#archive">归档</a></li>
+          <li><a href="#about">关于作者</a></li>
+          <li><a href="#top">回到顶部</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h5>联系</h5>
+        <ul>
+          <li><a href="mailto:hello@bluehour.studio">hello@bluehour.studio</a></li>
+          <li><a href="#top">RSS 订阅</a></li>
+          <li><a href="#top">写作约定</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© 2026 Blue Hour Studio</span>
+      <span>Made after sunset</span>
+      <a href="#top">回到顶部 ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script src="{{BASE}}js/theme.js" defer></script>
+<script src="{{BASE}}js/cursor.js" defer></script>
+<script src="{{BASE}}js/background.js" defer></script>
+<script src="{{BASE}}js/app.js" defer></script>
+</body>
+</html>

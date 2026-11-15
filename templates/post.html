@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} — BLUE HOUR</title>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('bh-theme');
+      if (t !== 'night' && t !== 'sunset') t = 'night';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<meta name="description" content="{{TITLE}}">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/effects.css">
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="l-inner">
+    <div class="l-ring"></div>
+    <div class="l-text">Blue Hour</div>
+  </div>
+</div>
+
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<canvas id="bg"></canvas>
+<canvas id="fx"></canvas>
+
+<div class="sunset-wash" aria-hidden="true"></div>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="rays" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grid-lines" aria-hidden="true"></div>
+<div class="particles" id="particles" aria-hidden="true"></div>
+<div class="sun" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress"></div>
+
+<button class="back-top" id="backTop" aria-label="回到顶部">
+  <svg viewBox="0 0 46 46" aria-hidden="true">
+    <circle class="bt-track" cx="23" cy="23" r="20"></circle>
+    <circle class="bt-progress" id="btProgress" cx="23" cy="23" r="20"></circle>
+  </svg>
+  <span>↑</span>
+</button>
+
+<aside class="tag-side" id="tagSide" aria-label="标签导航">
+  <button class="tag-rail" id="tagRail" aria-label="展开标签面板" aria-expanded="false" aria-controls="tagPanel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/>
+      <circle cx="7.5" cy="7.5" r="1.5"/>
+    </svg>
+    <span>标签</span>
+  </button>
+
+  <div class="tag-panel" id="tagPanel">
+    <div class="tag-panel-head">
+      <div>
+        <div class="tag-panel-title">文章标签</div>
+        <div class="tag-panel-desc">这篇用到的关键词</div>
+      </div>
+      <button class="tag-panel-close" id="tagClose" aria-label="收起标签面板">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tag-cloud-side">
+      {{TAGS_HTML}}
+    </div>
+
+    <div class="tag-panel-foot">
+      <a class="tag-clear" href="../index.html#posts">回到全部文章</a>
+    </div>
+  </div>
+</aside>
+
+<div class="tag-scrim" id="tagScrim" aria-hidden="true"></div>
+
+<button class="tag-fab" id="tagFab" aria-label="打开标签面板">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/>
+    <circle cx="7.5" cy="7.5" r="1.5"/>
+  </svg>
+</button>
+
+<header class="nav" id="nav">
+  <a class="logo" href="../index.html">BLUE<b>·</b>HOUR</a>
+  <nav id="mainNav">
+    <a href="../index.html#featured">精选</a>
+    <a href="../index.html#columns">栏目</a>
+    <a href="../index.html#series">系列</a>
+    <a href="../index.html#posts">文章</a>
+    <a href="../index.html#tags" id="navTags">标签</a>
+    <a href="../index.html#archive">归档</a>
+    <a href="../index.html#about">关于</a>
+  </nav>
+  <div class="theme-switch" role="group" aria-label="主题切换">
+    <span class="pill" aria-hidden="true"></span>
+    <button type="button" data-theme="night">夜</button>
+    <button type="button" data-theme="sunset">夕</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <article class="article">
+    <div class="wrap article-wrap">
+      <a class="article-back" href="../index.html#posts">
+        <span class="arw">←</span> 回到全部文章
+      </a>
+
+      <header class="article-head">
+        <div class="post-top">
+          <span class="cat">{{CATEGORY_LABEL}}</span>
+          <span>{{DATE}}</span>
+        </div>
+        <h1 class="article-title">{{TITLE}}</h1>
+        <div class="article-meta">
+          <span>{{READING_TIME}} 分钟阅读</span>
+          <span class="dotsep"></span>
+          <span>分类 · {{CATEGORY_LABEL}}</span>
+        </div>
+        {{TAGS_HTML}}
+      </header>
+
+      <div class="article-body">
+        {{CONTENT}}
+      </div>
+
+      <nav class="article-nav" aria-label="上下篇">
+        {{PREV_HTML}}
+        {{NEXT_HTML}}
+      </nav>
+
+      <div class="article-end">
+        <a class="btn magnetic" href="../index.html#posts">回到首页 <span class="arw">→</span></a>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-main">
+      <div class="foot-brand">
+        <a class="logo" href="../index.html">BLUE<b>·</b>HOUR</a>
+        <p>日落后二十分钟的个人写作台。关于设计、代码、工具与日常的长期笔记。</p>
+      </div>
+
+      <div class="foot-col">
+        <h5>浏览</h5>
+        <ul>
+          <li><a href="../index.html#featured">精选</a></li>
+          <li><a href="../index.html#columns">栏目</a></li>
+          <li><a href="../index.html#series">系列</a></li>
+          <li><a href="../index.html#posts">全部文章</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h5>更多</h5>
+        <ul>
+          <li><a href="../index.html#tags" id="footTags">标签</a></li>
+          <li><a href="../index.html#archive">归档</a></li>
+          <li><a href="../index.html#about">关于作者</a></li>
+          <li><a href="../index.html">回到首页</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h5>联系</h5>
+        <ul>
+          <li><a href="mailto:hello@bluehour.studio">hello@bluehour.studio</a></li>
+          <li><a href="../index.html">RSS 订阅</a></li>
+          <li><a href="../index.html">写作约定</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© 2026 Blue Hour Studio</span>
+      <span>Made after sunset</span>
+      <a href="#top">回到顶部 ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/theme.js" defer></script>
+<script src="../js/cursor.js" defer></script>
+<script src="../js/background.js" defer></script>
+<script src="../js/app.js" defer></script>
+</body>
+</html>

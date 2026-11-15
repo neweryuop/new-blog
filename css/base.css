@@ -1,0 +1,181 @@
+/* =========================================================
+   BLUE HOUR — base.css
+   @property 注册、夜/夕双主题变量、全局重置
+   ========================================================= */
+
+/* ---------- 可过渡颜色属性（主题切换平滑插值的关键） ---------- */
+@property --bg       { syntax:'<color>'; inherits:true; initial-value:#04060c; }
+@property --ink      { syntax:'<color>'; inherits:true; initial-value:#e9eefb; }
+@property --muted    { syntax:'<color>'; inherits:true; initial-value:#7789a8; }
+@property --line     { syntax:'<color>'; inherits:true; initial-value:rgba(130,165,235,.13); }
+@property --accent   { syntax:'<color>'; inherits:true; initial-value:#7ea6ff; }
+@property --stroke   { syntax:'<color>'; inherits:true; initial-value:rgba(150,182,255,.52); }
+@property --shadow   { syntax:'<color>'; inherits:true; initial-value:rgba(58,108,215,.55); }
+@property --glow1    { syntax:'<color>'; inherits:true; initial-value:rgba(48,92,180,.42); }
+@property --glow2    { syntax:'<color>'; inherits:true; initial-value:rgba(88,70,190,.30); }
+@property --glow3    { syntax:'<color>'; inherits:true; initial-value:rgba(30,128,168,.24); }
+@property --gA       { syntax:'<color>'; inherits:true; initial-value:#f6f9ff; }
+@property --gB       { syntax:'<color>'; inherits:true; initial-value:#b7cbec; }
+@property --gC       { syntax:'<color>'; inherits:true; initial-value:#4a67a0; }
+@property --cursorA  { syntax:'<color>'; inherits:true; initial-value:rgba(110,155,255,.14); }
+@property --cursorB  { syntax:'<color>'; inherits:true; initial-value:rgba(110,155,255,.05); }
+@property --pillBg   { syntax:'<color>'; inherits:true; initial-value:rgba(126,166,255,.18); }
+@property --navBg    { syntax:'<color>'; inherits:true; initial-value:rgba(4,6,12,.62); }
+@property --switchBg { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.02); }
+@property --cardA    { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.036); }
+@property --cardB    { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.006); }
+@property --gridLine { syntax:'<color>'; inherits:true; initial-value:rgba(150,175,235,.055); }
+@property --btnG1    { syntax:'<color>'; inherits:true; initial-value:#3b5fbe; }
+@property --btnG2    { syntax:'<color>'; inherits:true; initial-value:#7fa4ff; }
+@property --btnG3    { syntax:'<color>'; inherits:true; initial-value:#a9c3ff; }
+@property --btnHoverInk { syntax:'<color>'; inherits:true; initial-value:#06090f; }
+@property --inputBg  { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.03); }
+@property --inputLine{ syntax:'<color>'; inherits:true; initial-value:rgba(130,165,235,.16); }
+@property --chipOn   { syntax:'<color>'; inherits:true; initial-value:rgba(126,166,255,.18); }
+@property --featA    { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.05); }
+@property --featB    { syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,.01); }
+@property --tagBg    { syntax:'<color>'; inherits:true; initial-value:rgba(126,166,255,.07); }
+@property --barBg    { syntax:'<color>'; inherits:true; initial-value:rgba(130,165,235,.14); }
+@property --cursorInk{ syntax:'<color>'; inherits:true; initial-value:#e9eefb; }
+@property --vignette { syntax:'<color>'; inherits:true; initial-value:rgba(0,0,0,.55); }
+@property --sideBg   { syntax:'<color>'; inherits:true; initial-value:rgba(4,6,12,.72); }
+
+/* ---------- 默认：夜 ---------- */
+:root{
+  --bg:#04060c;
+  --ink:#e9eefb;
+  --muted:#7789a8;
+  --line:rgba(130,165,235,.13);
+  --accent:#7ea6ff;
+  --stroke:rgba(150,182,255,.52);
+  --shadow:rgba(58,108,215,.55);
+  --glow1:rgba(48,92,180,.42);
+  --glow2:rgba(88,70,190,.30);
+  --glow3:rgba(30,128,168,.24);
+  --gA:#f6f9ff;
+  --gB:#b7cbec;
+  --gC:#4a67a0;
+  --cursorA:rgba(110,155,255,.14);
+  --cursorB:rgba(110,155,255,.05);
+  --pillBg:rgba(126,166,255,.18);
+  --navBg:rgba(4,6,12,.62);
+  --switchBg:rgba(255,255,255,.02);
+  --cardA:rgba(255,255,255,.036);
+  --cardB:rgba(255,255,255,.006);
+  --gridLine:rgba(150,175,235,.055);
+  --btnG1:#3b5fbe;
+  --btnG2:#7fa4ff;
+  --btnG3:#a9c3ff;
+  --btnHoverInk:#06090f;
+  --inputBg:rgba(255,255,255,.03);
+  --inputLine:rgba(130,165,235,.16);
+  --chipOn:rgba(126,166,255,.18);
+  --featA:rgba(255,255,255,.05);
+  --featB:rgba(255,255,255,.01);
+  --tagBg:rgba(126,166,255,.07);
+  --barBg:rgba(130,165,235,.14);
+  --cursorInk:#e9eefb;
+  --vignette:rgba(0,0,0,.55);
+  --sideBg:rgba(4,6,12,.72);
+
+  /* 布局变量 */
+  --side-w:44px;
+  --side-w-open:268px;
+  --side-cur:var(--side-w);
+  --ease:cubic-bezier(.19,1,.22,1);
+}
+
+/* ---------- 夕：落日余光 ---------- */
+html[data-theme="sunset"]{
+  --bg:#f3e1d0;
+  --ink:#3a1e18;
+  --muted:#9c6a55;
+  --line:rgba(180,100,60,.18);
+  --accent:#e0683a;
+  --stroke:rgba(200,100,60,.50);
+  --shadow:rgba(220,105,55,.38);
+  --glow1:rgba(255,158,88,.60);
+  --glow2:rgba(255,110,110,.42);
+  --glow3:rgba(178,118,200,.32);
+  --gA:#2e1712;
+  --gB:#a4482a;
+  --gC:#6e2b3e;
+  --cursorA:rgba(224,104,58,.16);
+  --cursorB:rgba(224,104,58,.05);
+  --pillBg:rgba(224,104,58,.20);
+  --navBg:rgba(246,228,214,.78);
+  --switchBg:rgba(255,255,255,.62);
+  --cardA:rgba(255,252,246,.82);
+  --cardB:rgba(255,238,222,.46);
+  --gridLine:rgba(180,90,50,.09);
+  --btnG1:#d45c28;
+  --btnG2:#f08a52;
+  --btnG3:#ffc890;
+  --btnHoverInk:#2e1512;
+  --inputBg:rgba(255,255,255,.62);
+  --inputLine:rgba(180,100,60,.24);
+  --chipOn:rgba(224,104,58,.20);
+  --featA:rgba(255,252,246,.86);
+  --featB:rgba(255,232,214,.42);
+  --tagBg:rgba(224,104,58,.10);
+  --barBg:rgba(180,90,50,.18);
+  --cursorInk:#3a1e18;
+  --vignette:rgba(150,70,40,.24);
+  --sideBg:rgba(246,228,214,.84);
+}
+
+/* ---------- 主题切换过渡 ---------- */
+html{
+  transition:
+    --bg 1.1s ease, --ink 1.1s ease, --muted 1.1s ease, --line 1.1s ease,
+    --accent 1.1s ease, --stroke 1.1s ease, --shadow 1.1s ease,
+    --glow1 1.6s ease, --glow2 1.6s ease, --glow3 1.6s ease,
+    --gA 1.1s ease, --gB 1.1s ease, --gC 1.1s ease,
+    --cursorA 1.1s ease, --cursorB 1.1s ease,
+    --pillBg 1.1s ease, --navBg 1.1s ease,
+    --switchBg 1.1s ease, --cardA 1.1s ease, --cardB 1.1s ease,
+    --gridLine 1.1s ease,
+    --btnG1 1.1s ease, --btnG2 1.1s ease, --btnG3 1.1s ease,
+    --btnHoverInk 1.1s ease,
+    --inputBg 1.1s ease, --inputLine 1.1s ease, --chipOn 1.1s ease,
+    --featA 1.1s ease, --featB 1.1s ease,
+    --tagBg 1.1s ease, --barBg 1.1s ease,
+    --cursorInk 1.1s ease, --vignette 1.1s ease, --sideBg 1.1s ease;
+}
+
+/* ---------- 全局重置 ---------- */
+*{ margin:0; padding:0; box-sizing:border-box; }
+html, body{ overflow-x:hidden; }
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  cursor:none;
+  position:relative;
+  transition:background 1.1s ease;
+}
+
+/* 夕主题：天空渐变铺满 body */
+html[data-theme="sunset"] body{
+  background:
+    radial-gradient(ellipse 110% 62% at 82% -6%, rgba(255,208,140,.75) 0%, rgba(255,170,110,.35) 32%, transparent 62%),
+    radial-gradient(ellipse 90% 50% at 12% 108%, rgba(150,72,120,.30) 0%, transparent 62%),
+    radial-gradient(ellipse 70% 40% at 50% 45%, rgba(255,140,90,.10) 0%, transparent 70%),
+    var(--bg);
+}
+
+/* 侧栏展开时同步全局侧栏宽度变量 */
+body.tag-open{ --side-cur:var(--side-w-open); }
+
+/* 触屏设备恢复系统光标 */
+@media (pointer: coarse){
+  body{ cursor:auto; }
+}
+
+::selection{ background:var(--pillBg); color:var(--ink); }
+a{ color:inherit; }
+button{ font-family:inherit; cursor:inherit; }
+input{ cursor:inherit; }
